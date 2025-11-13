@@ -1,0 +1,44 @@
+spring:
+  application:
+    name: PickGlow   #设置项目名称
+  datasource:
+    # 基础数据源配置
+    url: jdbc:mysql://localhost:3306/pickglow?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+
+server:
+  port: 8081  #项目端口
+
+
+# knife4j接口文档相关配置
+knife4j:
+  enable: true
+  openapi:
+    title: PickGlow后端接口文档
+    description:
+    email: 3136188547@qq.com
+    concat: 大菜鸟
+    version: v4.0
+    license: Apache 2.0
+    group:
+      test1:
+        group-name: controller
+        api-rule: package
+        api-rule-resources:
+          - com.studentpulse.controller
+
+# MyBatis-Plus 相关配置
+mybatis-plus:
+  mapper-locations: classpath:mapper/*.xml  # 扫描xml文件路径
+  global-config:  # 全局配置
+    db-config:
+
+      id-type: auto  # 主键生成策略
+  # 原生 MyBatis 配置（可选）
+  configuration:
+    map-underscore-to-camel-case: true  # 下划线转驼峰（例如：user_name → userName）
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl  # 打印 SQL 日志（开发环境推荐开启）
+    cache-enabled: false  # 关闭二级缓存（默认 false，按需开启）
