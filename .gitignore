@@ -3,3 +3,9 @@
 **PickGlow-backend/target/**
 **PickGlow-backend/src/test/**
 **PickGlow-backend/src/main/resources/application-local.yml
+
+
+
+##前端项目排除文件##
+**PickGlow/.vscode/**
+**PickGlow/node_modules/**
