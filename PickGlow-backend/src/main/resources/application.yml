@@ -35,10 +35,9 @@ mybatis-plus:
   mapper-locations: classpath:mapper/*.xml  # 扫描xml文件路径
   global-config:  # 全局配置
     db-config:
-
-      id-type: auto  # 主键生成策略
+      id-type: assign_id  # 雪花算法生成主键
   # 原生 MyBatis 配置（可选）
   configuration:
     map-underscore-to-camel-case: true  # 下划线转驼峰（例如：user_name → userName）
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl  # 打印 SQL 日志（开发环境推荐开启）
-    cache-enabled: false  # 关闭二级缓存（默认 false，按需开启）
+    cache-enabled: true  # 关闭二级缓存（默认 false，按需开启）

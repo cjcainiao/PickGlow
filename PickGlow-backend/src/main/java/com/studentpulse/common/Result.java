@@ -1,6 +1,8 @@
 package com.studentpulse.common;
 
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.io.Serializable;
 
@@ -8,6 +10,8 @@ import java.io.Serializable;
  * 全局统一响应类
  */
 @Data
+@Getter
+@Setter
 public class Result implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -42,5 +46,9 @@ public class Result implements Serializable {
 
     public static Result error(Integer code, String msg) {
         return new Result(code, msg, null);
+    }
+
+    public static Result error( String msg) {
+        return new Result(401, msg, null);
     }
 }
