@@ -1,12 +1,12 @@
 package com.studentpulse.service.Impl;
 
 
-
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.studentpulse.Annotation.ParameterHasNull;
 import com.studentpulse.common.Result;
+import com.studentpulse.common.UserContextHolder;
 import com.studentpulse.common.utils.JwtUtil;
 import com.studentpulse.common.utils.PasswordUtil;
 import com.studentpulse.exception.BaseException;
@@ -14,6 +14,7 @@ import com.studentpulse.mapper.UserMapper;
 import com.studentpulse.model.dto.UserLoginRequest;
 import com.studentpulse.model.dto.UserRegisterRequest;
 import com.studentpulse.model.entity.User;
+import com.studentpulse.model.vo.UserInfoResponse;
 import com.studentpulse.model.vo.UserLoginResponse;
 import com.studentpulse.service.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -34,21 +35,25 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Resource
     private Cache<Long, User> userCache;
 
+    @Resource
+    private UserMapper userMapper;
+
     /**
      * 注册功能业务
+     *
      * @param userRegisterRequest
      */
     @ParameterHasNull
     public void userRegister(UserRegisterRequest userRegisterRequest) {
 
         //1、判断两次密码是否一致
-        if(!userRegisterRequest.getPassword().equals(userRegisterRequest.getCheckPassword())){
+        if (!userRegisterRequest.getPassword().equals(userRegisterRequest.getCheckPassword())) {
             throw new BaseException("两次密码不一致！");
         }
 
         //2、判断用户名是否被使用
         Long count = query().eq("user_name", userRegisterRequest.getUserName()).count();
-        if(count>0) {
+        if (count > 0) {
             throw new BaseException("用户已存在!");
         }
 
@@ -59,7 +64,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
         //4、保存用户信息
         boolean save = save(user);
-        if(!save){
+        if (!save) {
             log.error("用户注册失败....");
             throw new BaseException("注册失败");
         }
@@ -68,6 +73,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     /**
      * 用户登录业务
+     *
      * @param userLoginRequest
      */
     @ParameterHasNull
@@ -75,25 +81,25 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         //1、判断用户是否在线,先拿到用户id
         User user = query().eq("user_name", userLoginRequest.getUserName()).one();
         Object o = userCache.getIfPresent(user.getId());
-        if(o!= null){
+        if (o != null) {
             throw new BaseException("请勿重复登录！");
         }
 
         //2、判断用户账号状态是否正常
-        if(user.getStatus()!= 1) {
+        if (user.getStatus() != 1) {
             throw new BaseException("当前账号状态异常，请及时联系管理员!");
         }
 
         //3、校验账号和密码
         String userName = user.getUserName();
-        if(!(userName.equals(userLoginRequest.getUserName()) && PasswordUtil.checkPassword(userLoginRequest.getPassword(),user.getPassword()))){
-            throw  new BaseException("用户名或密码错误！");
+        if (!(userName.equals(userLoginRequest.getUserName()) && PasswordUtil.checkPassword(userLoginRequest.getPassword(), user.getPassword()))) {
+            throw new BaseException("用户名或密码错误！");
         }
 
         //4、生成唯一token
-        Map<String,Object> mp  = new HashMap<>();
-        mp.put("id",user.getId());
-        mp.put("name",user.getUserName());
+        Map<String, Object> mp = new HashMap<>();
+        mp.put("id", user.getId());
+        mp.put("name", user.getUserName());
         String token = JwtUtil.createToken(mp);
 
         //5、缓存用户登录信息
@@ -102,9 +108,63 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
         userLoginResponse.setToken(token);
         //缓存
-        userCache.put(user.getId(),user);
+        userCache.put(user.getId(), user);
 
         return userLoginResponse;
+    }
+
+    /**
+     * 用户注销
+     *
+     * @param id
+     */
+    public void logout(Long id) {
+        //1、判断参数是否为空
+        if (id == null) throw new BaseException("参数异常！");
+
+        //2、判断是否是注销自己
+        User user = UserContextHolder.get();
+
+        System.out.println("id...." + id);
+
+        System.out.println("userid....." + user.getId());
+        if (!id.equals(user.getId())) throw new BaseException("非法操作！");
+
+        //3、判断是否在线
+        User present = userCache.getIfPresent(id);
+
+        System.out.println(present);
+        //4、清除用户信息
+        if (present != null) {
+            userCache.invalidate(id);
+        }
+    }
+
+
+    /**
+     * 获取用户信息
+     *
+     * @return
+     */
+    public UserInfoResponse getUserInfo() {
+        //1、获取用户id
+        User user = UserContextHolder.get();
+
+        log.info("获取用户信息....."+user);
+
+        if (user == null) {
+            throw new BaseException(400, "获取用户信息失败！");
+        }
+
+        //2、查询用户信息
+        //先从缓存中获取
+        User present = userCache.getIfPresent(user.getId());
+        if (present != null) {
+            return BeanUtil.copyProperties(present, UserInfoResponse.class);
+        }
+        //查询数据库
+        User one = query().eq("id", user.getId()).one();
+        return BeanUtil.copyProperties(one, UserInfoResponse.class);
     }
 
 

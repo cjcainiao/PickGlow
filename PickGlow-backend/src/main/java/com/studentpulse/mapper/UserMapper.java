@@ -10,6 +10,7 @@ import com.studentpulse.model.entity.User;
  */
 public interface UserMapper extends BaseMapper<User> {
 
+
 }
 
 

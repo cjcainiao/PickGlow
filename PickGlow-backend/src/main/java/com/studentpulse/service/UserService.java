@@ -2,10 +2,10 @@ package com.studentpulse.service;
 
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.studentpulse.common.Result;
 import com.studentpulse.model.dto.UserLoginRequest;
 import com.studentpulse.model.dto.UserRegisterRequest;
 import com.studentpulse.model.entity.User;
+import com.studentpulse.model.vo.UserInfoResponse;
 import com.studentpulse.model.vo.UserLoginResponse;
 
 
@@ -25,4 +25,19 @@ public interface UserService extends IService<User> {
      * @param userLoginRequest
      */
     UserLoginResponse userLogin(UserLoginRequest userLoginRequest);
+
+    /**
+     * 用户注销
+     * @param id
+     */
+    void logout(Long id);
+
+    /**
+     * 获取用户信息
+     * @return
+     */
+    UserInfoResponse getUserInfo();
+
+
+
 }

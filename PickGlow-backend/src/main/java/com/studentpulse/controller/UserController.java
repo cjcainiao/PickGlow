@@ -3,12 +3,11 @@ package com.studentpulse.controller;
 import com.studentpulse.common.Result;
 import com.studentpulse.model.dto.UserLoginRequest;
 import com.studentpulse.model.dto.UserRegisterRequest;
+import com.studentpulse.model.entity.User;
+import com.studentpulse.model.vo.UserInfoResponse;
 import com.studentpulse.model.vo.UserLoginResponse;
 import com.studentpulse.service.UserService;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 
@@ -48,6 +47,40 @@ public class UserController {
         return Result.success(200,"登录成功！",userLoginResponse);
     }
 
+
+    /**
+     * 用户注销
+     * @param id
+     * @return
+     */
+    @GetMapping("/logout/{id}")
+    public Result logout(@PathVariable Long id){
+        userService.logout(id);
+        return Result.success(200,"退出成功！");
+    }
+
+
+    /**
+     * 获取用户信息
+     * @return
+     */
+    @GetMapping("/getUserInfo")
+    public Result getUserInfo(){
+
+        UserInfoResponse userInfo = userService.getUserInfo();
+        return Result.success(200,"获取用户信息成功!",userInfo);
+    }
+
+    /**
+     * 修改用户信息
+     * @return
+     */
+    //todo 想好在弄
+    @PutMapping("/updateUserInfo")
+    public Result updateUserInfo(){
+
+        return null;
+    }
 
 
 }
