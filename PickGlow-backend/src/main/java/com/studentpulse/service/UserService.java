@@ -39,5 +39,9 @@ public interface UserService extends IService<User> {
     UserInfoResponse getUserInfo();
 
 
-
+    /**
+     * 修改用户信息
+     * @param user
+     */
+    void updateUserInfoById(User user);
 }

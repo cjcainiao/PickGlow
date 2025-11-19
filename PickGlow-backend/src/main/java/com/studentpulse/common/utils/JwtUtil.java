@@ -1,6 +1,7 @@
 package com.studentpulse.common.utils;
 
 
+import com.studentpulse.exception.BaseException;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 
@@ -43,10 +44,18 @@ public class JwtUtil {
      * @return
      */
     public static Jws<Claims> parseClaim(String token) {
-        return Jwts.parser()
-                .verifyWith(KEY)
-                .build()
-                .parseSignedClaims(token);
+
+        try{
+            return Jwts.parser()
+                    .verifyWith(KEY)
+                    .build()
+                    .parseSignedClaims(token);
+        }catch (ExpiredJwtException e){
+            throw new BaseException(400, "登录已过期！");
+        }catch (JwtException e){
+            throw new BaseException(401,"用户信息解析异常");
+        }
+
     }
 
 

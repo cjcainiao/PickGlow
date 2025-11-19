@@ -39,7 +39,7 @@ public class UserRequestInterceptor implements HandlerInterceptor {
         User user = new User();
         user.setId(claims.get("id", Long.class));
         user.setUserName(claims.get("name", String.class));
-
+        user.setRole(claims.get("role", String.class));
         UserContextHolder.set(user);
 
         return true;

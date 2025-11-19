@@ -100,6 +100,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         Map<String, Object> mp = new HashMap<>();
         mp.put("id", user.getId());
         mp.put("name", user.getUserName());
+        mp.put("role", user.getRole());
         String token = JwtUtil.createToken(mp);
 
         //5、缓存用户登录信息
@@ -165,6 +166,25 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         //查询数据库
         User one = query().eq("id", user.getId()).one();
         return BeanUtil.copyProperties(one, UserInfoResponse.class);
+    }
+
+
+    /**
+     * 修改用户信息
+     * @param user
+     */
+    public void updateUserInfoById(User user) {
+        //1、先获取当前用户id
+        User user1 = UserContextHolder.get();
+        if(!user1.getId().equals(user.getId())){
+            throw new BaseException(400,"非法操作！");
+        }
+        //2、修改用户信息
+        boolean update = updateById(user);
+
+        if(!update){
+            throw new BaseException(400,"修改用户信息失败！");
+        }
     }
 
 

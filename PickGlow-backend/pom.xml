@@ -64,6 +64,7 @@
 			<scope>runtime</scope>
 		</dependency>
 
+		<!-- v3.5.9版本开始要自己引入分页插件 -->
 		<!-- mybatis-plus依赖Springboot2版本 -->
 		<dependency>
 			<groupId>com.baomidou</groupId>

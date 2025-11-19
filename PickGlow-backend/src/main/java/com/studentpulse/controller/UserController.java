@@ -75,11 +75,11 @@ public class UserController {
      * 修改用户信息
      * @return
      */
-    //todo 想好在弄
+    //todo 简单修改，后续在调整
     @PutMapping("/updateUserInfo")
-    public Result updateUserInfo(){
-
-        return null;
+    public Result updateUserInfo(User user){
+        userService.updateUserInfoById(user);
+        return Result.success(200,"修改用户信息成功!");
     }
 
 
